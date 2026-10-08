@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>แคปชั่นแม่ค้า</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f5fb;--card:#fff;--ink:#1c1b3a;--mute:#6b6a85;--line:#dedcee;--accent:#ffd84d;--accent-ink:#1c1b3a;--ok:#1f9e7f;--hole:#f6f5fb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15142b;--card:#201f3d;--ink:#f1f0ff;--mute:#a3a2c2;--line:#37365e;--hole:#15142b}}
+:root[data-theme="dark"]{--bg:#15142b;--card:#201f3d;--ink:#f1f0ff;--mute:#a3a2c2;--line:#37365e;--hole:#15142b}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Prompt',system-ui,-apple-system,'Noto Sans Thai',sans-serif;line-height:1.6;font-size:16px}
+main{max-width:520px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:26px;margin:4px 0 2px;font-weight:600}
+.sub{color:var(--mute);margin:0 0 16px;font-size:14px}
+.demo{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--mute);margin-bottom:16px}
+label{display:block;font-weight:500;margin:16px 0 6px;font-size:15px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px}
+textarea{min-height:84px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.go{width:100%;margin-top:22px;font:inherit;font-weight:600;font-size:17px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:14px;cursor:pointer}
+.go:active{transform:scale(.98)}
+.left{text-align:center;color:var(--mute);font-size:13px;margin:8px 0 0}
+.err{color:#c0392b;font-size:14px;margin:8px 0 0;min-height:1em}
+#out{margin-top:24px}
+.tag{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:6px 16px 16px 16px;padding:18px 16px 14px 44px;margin-bottom:14px}
+.tag::before{content:"";position:absolute;left:16px;top:20px;width:14px;height:14px;border-radius:50%;background:var(--hole);border:1.5px solid var(--line)}
+.tag p{margin:0 0 12px;white-space:pre-wrap;word-break:break-word}
+.copy{font:inherit;font-size:14px;font-weight:500;background:transparent;color:var(--ink);border:1.5px solid var(--ink);border-radius:8px;padding:6px 14px;cursor:pointer}
+.copy.done{background:var(--ok);border-color:var(--ok);color:#fff}
+.wall{background:var(--card);border:1.5px solid var(--accent);border-radius:14px;padding:16px;text-align:center}
+.wall b{display:block;margin-bottom:4px}
+.link{font:inherit;font-size:13px;color:var(--mute);background:none;border:0;text-decoration:underline;margin-top:8px;cursor:pointer}
+h2{font-size:17px;margin:30px 0 10px}
+.hist{display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.hist span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+<main>
+  <h1>แคปชั่นแม่ค้า</h1>
+  <p class="sub">ใส่ชื่อสินค้า กดปุ่มเดียว ได้แคปชั่น 3 แบบ</p>
+  <div class="demo">ต้นแบบ: ตอนนี้สร้างจากแม่แบบข้อความ ยังไม่ได้ต่อ AI จริง</div>
+
+  <label for="name">ชื่อสินค้า</label>
+  <input id="name" type="text" placeholder="เช่น ครีมกันแดดเนื้อบางเบา" autocomplete="off">
+
+  <label for="hl">จุดเด่น (บรรทัดละข้อ)</label>
+  <textarea id="hl" placeholder="กันน้ำ กันเหงื่อ&#10;ไม่เหนียวหน้า&#10;SPF50+"></textarea>
+
+  <label>โทน</label>
+  <div class="chips" id="tones" role="group" aria-label="โทน"></div>
+
+  <label>ช่องทางที่จะโพสต์</label>
+  <div class="chips" id="plats" role="group" aria-label="ช่องทาง"></div>
+
+  <button class="go" id="go" type="button">สร้างแคปชั่น</button>
+  <p class="err" id="err" role="alert"></p>
+  <p class="left" id="left"></p>
+
+  <div id="out"></div>
+
+  <h2>ที่เคยสร้าง</h2>
+  <div id="hist"><p class="sub">ยังไม่มีประวัติ</p></div>
+</main>
+
+<script>
+(function(){
+var TONES={cute:'น่ารัก',formal:'ทางการ',urgent:'ขายด่วน',teen:'วัยรุ่น'};
+var PLATS={facebook:'Facebook',ig:'Instagram',tiktok:'TikTok',shopee:'Shopee'};
+var CTA={facebook:'ทักแชทสั่งได้เลยนะ 💬',ig:'กดลิงก์ในไบโอได้เลย 🔗',tiktok:'กดตะกร้าเหลืองได้เลย 🛒',shopee:'กดสั่งซื้อในร้านได้เลย 🛍️'};
+var TAGS={facebook:['#ขายของออนไลน์','#สินค้าแนะนำ'],ig:['#รีวิว','#ของดีบอกต่อ'],tiktok:['#tiktokแม่ค้า','#ของมันต้องมี'],shopee:['#shopeethailand','#ช้อปปี้']};
+var TPL={
+cute:[function(n,h,b){return '✨ '+n+' มาแล้วจ้า~\n'+h+'\nน่ารักขนาดนี้ ต้องมีติดบ้านแล้วนะ 💕'},
+ function(n,h,b){return 'ใครกำลังมองหา '+n+' อยู่บ้าง? 🙋\nบอกเลยว่า '+h+'\nรักเลยแหละ!'},
+ function(n,h,b){return 'วันนี้ขอแนะนำ '+n+' 🎀\n'+b+'\nของมันต้องมีจริง ๆ จ้า'}],
+formal:[function(n,h,b){return 'ขอแนะนำ '+n+'\nจุดเด่น: '+h+'\nคุณภาพที่คุณวางใจได้'},
+ function(n,h,b){return n+' ตอบโจทย์การใช้งานของคุณ\n'+b+'\nสอบถามรายละเอียดเพิ่มเติมได้'},
+ function(n,h,b){return 'เลือกสิ่งที่ดีกว่าด้วย '+n+'\n'+h}],
+urgent:[function(n,h,b){return '🔥 ด่วน! '+n+' ของมีจำกัด\n'+h+'\nหมดแล้วหมดเลยนะ!'},
+ function(n,h,b){return '⏰ โปรวันนี้เท่านั้น! '+n+'\n'+b+'\nรีบก่อนหมด'},
+ function(n,h,b){return '🚨 มาแล้ว! '+n+'\n'+h+'\nใครช้า อดนะ'}],
+teen:[function(n,h,b){return 'เฮ้ย '+n+' คือดีงามมาก 😭✨\n'+h+'\nบอกเลยว่าต้องจัด!'},
+ function(n,h,b){return 'POV: ได้ '+n+' มาไว้ในมือ 🫶\n'+h+'\nปังแบบไม่ต้องเค้น'},
+ function(n,h,b){return 'ตัวนี้ปัง '+n+' 💯\n'+b+'\nจัดดิ รออะไร'}]
+};
+var LIMIT=3, tone='cute', plat='facebook';
+var $=function(i){return document.getElementById(i)};
+
+function store(k,v){try{if(v===undefined){var r=localStorage.getItem(k);return r?JSON.parse(r):null}localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+var mem={u:null,h:[]};
+function today(){return new Date().toLocaleDateString('sv')}
+function usage(){var u=store('cap_usage')||mem.u;if(!u||u.d!==today())u={d:today(),n:0};return u}
+function saveUsage(u){mem.u=u;store('cap_usage',u)}
+function history(){return store('cap_hist')||mem.h}
+
+function chips(box,map,get,set){
+  Object.keys(map).forEach(function(k){
+    var b=document.createElement('button');b.type='button';b.className='chip';b.textContent=map[k];
+    b.setAttribute('aria-pressed',String(get()===k));
+    b.onclick=function(){set(k);Array.prototype.forEach.call(box.children,function(c,i){c.setAttribute('aria-pressed',String(Object.keys(map)[i]===k))})};
+    box.appendChild(b);
+  });
+}
+chips($('tones'),TONES,function(){return tone},function(k){tone=k});
+chips($('plats'),PLATS,function(){return plat},function(k){plat=k});
+
+function updateLeft(){var l=LIMIT-usage().n;$('left').textContent=l>0?'วันนี้ใช้ฟรีได้อีก '+l+' ครั้ง':'ใช้ฟรีครบแล้ววันนี้'}
+
+function make(name,lines){
+  var h=lines.length?lines.join(' • '):'คุณภาพดี ราคาน่ารัก';
+  var b=lines.length?lines.map(function(x){return '• '+x}).join('\n'):'• คุณภาพดี\n• ราคาน่ารัก';
+  var tag='#'+name.replace(/\s+/g,'');
+  var tail='\n\n'+CTA[plat]+'\n'+[tag].concat(TAGS[plat]).join(' ');
+  return TPL[tone].map(function(f){return f(name,h,b)+tail});
+}
+
+function copyText(t,btn){
+  function ok(){btn.textContent='คัดลอกแล้ว';btn.classList.add('done');setTimeout(function(){btn.textContent='คัดลอก';btn.classList.remove('done')},1600)}
+  function fb(){var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){}document.body.removeChild(a)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,fb)}else{fb()}
+}
+
+function show(list){
+  var out=$('out');out.textContent='';
+  list.forEach(function(t){
+    var c=document.createElement('div');c.className='tag';
+    var p=document.createElement('p');p.textContent=t;
+    var b=document.createElement('button');b.type='button';b.className='copy';b.textContent='คัดลอก';
+    b.onclick=function(){copyText(t,b)};
+    c.appendChild(p);c.appendChild(b);out.appendChild(c);
+  });
+}
+
+function wall(){
+  var out=$('out');out.textContent='';
+  var w=document.createElement('div');w.className='wall';
+  w.innerHTML='<b>ใช้ฟรีครบ '+LIMIT+' ครั้งแล้ววันนี้</b>สมัครสมาชิกเพื่อใช้ได้ไม่จำกัด (ส่วนนี้เป็นตัวอย่าง ยังไม่ได้เก็บเงินจริง)';
+  var r=document.createElement('button');r.type='button';r.className='link';r.textContent='รีเซ็ตตัวนับเพื่อทดลองต่อ';
+  r.onclick=function(){saveUsage({d:today(),n:0});updateLeft();out.textContent=''};
+  w.appendChild(document.createElement('br'));w.appendChild(r);out.appendChild(w);
+}
+
+function renderHist(){
+  var box=$('hist'),h=history();box.textContent='';
+  if(!h.length){var p=document.createElement('p');p.className='sub';p.textContent='ยังไม่มีประวัติ';box.appendChild(p);return}
+  h.forEach(function(e){
+    var row=document.createElement('div');row.className='hist';
+    var s=document.createElement('span');s.textContent=e.name+' · '+TONES[e.tone];
+    var b=document.createElement('button');b.type='button';b.className='copy';b.textContent='ดู';
+    b.onclick=function(){show(e.list);window.scrollTo({top:$('out').offsetTop-20,behavior:'smooth'})};
+    row.appendChild(s);row.appendChild(b);box.appendChild(row);
+  });
+}
+
+$('go').onclick=function(){
+  var name=$('name').value.trim();
+  $('err').textContent='';
+  if(!name){$('err').textContent='กรอกชื่อสินค้าก่อนนะ';$('name').focus();return}
+  var u=usage();
+  if(u.n>=LIMIT){wall();return}
+  var lines=$('hl').value.split(/\n|,/).map(function(x){return x.trim()}).filter(Boolean).slice(0,6);
+  var list=make(name,lines);
+  show(list);
+  u.n++;saveUsage(u);updateLeft();
+  var h=history();h.unshift({name:name,tone:tone,list:list});h=h.slice(0,5);mem.h=h;store('cap_hist',h);renderHist();
+};
+
+updateLeft();renderHist();
+})();
+</script>
+</body>
+</html>
